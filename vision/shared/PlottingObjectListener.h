@@ -24,6 +24,13 @@ public:
         out_stream_ << std::endl;
         out_stream_.precision(2);
         out_stream_ << std::fixed;
+
+        // set the timeout to the max callback interval
+        for (const auto& pair : callback_intervals) {
+            if (pair.second > timeout_) {
+                timeout_ = pair.second;
+            }
+        }
     }
 
     std::map<Feature, Duration> getCallbackIntervals() const override {
