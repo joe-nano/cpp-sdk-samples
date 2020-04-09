@@ -301,9 +301,12 @@ int main(int argsc, char** argsv) {
         std::cerr << description << std::endl;
         return 1;
     }
-    // create the Detector
-    vision::SyncFrameDetector detector = vision::SyncFrameDetector(program_options.data_dir, program_options.num_faces);
+
+    std::shared_ptr<vision::SyncFrameDetector> detector;
+
     try {
+        // create the Detector
+        detector = std::make_shared<vision::SyncFrameDetector>(program_options.data_dir, program_options.num_faces);
 
         //initialize the output file
         std::string
@@ -341,33 +344,33 @@ int main(int argsc, char** argsv) {
 
         switch (program_options.detection_type) {
             case program_options.OBJECT:
-                processObjectVideo(detector, csv_file_stream, program_options);
+                processObjectVideo(*detector, csv_file_stream, program_options);
                 break;
             case program_options.OCCUPANT:
-                processOccupantVideo(detector, csv_file_stream, program_options);
+                processOccupantVideo(*detector, csv_file_stream, program_options);
                 break;
             case program_options.FACE:
                 //update the detector accordingly
-                detector = vision::SyncFrameDetector(program_options.data_dir, program_options.num_faces);
-                processFaceVideo(detector, csv_file_stream, program_options);
+                detector = std::make_shared<vision::SyncFrameDetector>(program_options.data_dir, program_options.num_faces);
+                processFaceVideo(*detector, csv_file_stream, program_options);
                 break;
             default:
                 std::cerr << "This should never happen " << program_options.detection_type << std::endl;
                 return 1;
         }
 
-        detector.stop();
+        detector->stop();
         csv_file_stream.close();
 
         std::cout << "Output written to file: " << csv_path << std::endl;
     }
     catch (std::exception& ex) {
         StatusListener::printException(ex);
-        // if video_reader couldn't load the video/image, it will throw. Since the detector was started before initializing the video_reader, We need to call `detector.stop()` to avoid crashing
-        detector.stop();
+        // if video_reader couldn't load the video/image, it will throw. Since the detector was started before initializing the video_reader, We need to call `detector->stop()` to avoid crashing
+        if (detector) {
+            detector->stop();
+        }
         return 1;
     }
     return 0;
 }
-
-

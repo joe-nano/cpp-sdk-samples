@@ -396,7 +396,9 @@ int main(int argsc, char** argsv) {
     }
     catch (std::exception& ex) {
         StatusListener::printException(ex);
-        frame_detector->stop();
+        if (frame_detector){
+            frame_detector->stop();
+        }
         return 1;
     }
 
