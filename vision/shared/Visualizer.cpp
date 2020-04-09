@@ -240,7 +240,7 @@ void Visualizer::drawOccupantMetrics(const affdex::vision::Occupant& occupant) {
     const std::string region_type(affdex::vision::CabinRegion::typeToString(occupant.matchedSeat.cabinRegion.type));
     const std::string match_confidence(std::to_string(occupant.matchedSeat.matchConfidence));
 
-    drawText("Confidence", match_confidence, cv::Point(occupant.boundingBox.getTopLeft().x, padding -= spacing),
+    drawText("Region's Confidence", match_confidence, cv::Point(occupant.boundingBox.getTopLeft().x, padding -= spacing),
              false);
     drawText("Region " + id, region_type, cv::Point(occupant.boundingBox.getTopLeft().x, padding -= spacing), false);
 }
@@ -279,10 +279,17 @@ void Visualizer::drawObjectMetrics(const affdex::vision::Object& object) {
     const std::string
         region_type(affdex::vision::CabinRegion::typeToString(object.matchedRegions[0].cabinRegion.type));
 
-    const std::string match_confidence(std::to_string(object.confidence));
+    const std::string confidence(std::to_string(object.confidence));
+    const std::string regions_confidence(std::to_string(object.matchedRegions[0].matchConfidence));
+
 
     drawText("Confidence",
-             match_confidence,
+             confidence,
+             cv::Point(object.boundingBox.getTopLeft().x, padding -= spacing),
+             false);
+
+    drawText("Region's Confidence",
+             regions_confidence,
              cv::Point(object.boundingBox.getTopLeft().x, padding -= spacing),
              false);
 
